@@ -1,7 +1,6 @@
 import sys
 import io
 import os
-import decimal
 
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
@@ -96,3 +95,8 @@ print(resultData)
 # https://www.data.go.kr/data/3051587/fileData.do 공항 이름 모음
 # 참조 https://wikidocs.net/231233
 
+# https://www.data.go.kr/data/15003087/fileData.do
+
+# https://flight.naver.com/flights/international
+# 1. 데이터를 정기적으로 크롤링 하는 방법을 고안. 
+# 2. 크롤링한 데이터를 db에 연동하는 방법을 고안.
