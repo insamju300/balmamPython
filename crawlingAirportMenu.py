@@ -74,10 +74,43 @@ for airportContainer in airportContainers:
     code = airportContainer.find_element(By.CSS_SELECTOR, ".autocomplete_code__i9Scs").text
     airport = NaverAirport(city, country, code, False)
     airportCords.append(airport)
+# for airportCord in airportCords:
+#     print(airportCord)
+
+####날짜 관련 처리
+
+driver.find_element(By.CSS_SELECTOR, '.searchBox_tablist__1uWMk').click()
+driver.find_element(By.CSS_SELECTOR, '.tabContent_option__2y4c6.select_Date__1aF7Y:last-child').click()
+
+여기서 막날 가져올 것 - calendar_date__1T0wq
 
 
-for airportCord in airportCords:
-    print(airportCord)
+# WebDriverWait(driver, 10).until(
+#     EC.presence_of_all_elements_located((By.CLASS_NAME, 'month'))
+# )    
+
+
+# months = driver.find_elements(By.CLASS_NAME, 'month')
+# lastMonth = months[-1]
+
+# yearAndMonth=lastMonth.find_element(By.CSS_SELECTOR, '.sc-iqcoie.dCaTmH').text.split(".")
+# year=int(yearAndMonth[0])
+# month=int(yearAndMonth[1])
+# print(year)
+# print(month)
+
+# days=lastMonth.find_elements(By.CSS_SELECTOR, '.day:not(.invalid)')
+# print(len(days))
+# lastDay = days[-1]
+# print(lastDay.get_attribute("outerHTML"))
+
+
+# lastDay = days[-1]
+# # day=lastDay.find_element(By.CSS_SELECTOR, '.num').text
+# print(lastDay.get_attribute('innerHTML'))
+    
+
+
 # print(toAirportCords)
 ##네이버에서 지원하는 공항 목록 가져오기
 
@@ -85,6 +118,7 @@ for airportCord in airportCords:
 ## 1. 공항 목록 더 깔끔하게 객체처럼 정리하기. 도시, 국가, 코드 세개 들고 올 것. ㅇ
 ## 2. 현재 선택할 수 있는 마지막 날짜 들고 올 것. 
 ## 3. 해당 두가지 데이터를 DB에 보관할 것(들고와서 검색하게 된다.) 크롤링 버전이라는 db를 추가하고 최신 갱신일을 넣은 후에, 해당 version id city country code is_departure을 db에보관한다.
+##    버전에는 ok 코드를 추가한다.
 ## 4. main.py에 출발공항, 도착공항, 출발일, 도착일을 파라미터로 받으면, 스크롤 다운하며 긁어온 모든 데이터를 객체화해서 JSON으로 바꿔서 반환해주는 url을 추가한다.
 ## 5. 검색어와 index를 인자로 받아서, 클릭하면 성인 모든 결제수단 링크를 반환하는 url을 만든다.
 ## 6. 해당 기능을 랭체인과 연결 하여 java코드 작성
