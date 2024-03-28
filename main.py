@@ -71,8 +71,8 @@ async def createPlan(
 
     template = """너는 30년 경력 배태랑의 여행 플래너야.
     넌 지금부터 손님이 패키지를 통하지 않고 직접 여행하기 위한 플랜을 짜줘야해.
-    손님은 {enterDate}에 {enterAirplane}에 도착할 예정이야.
-    그리고 {removeAirplane}에서 {removeDate}에 출발할 예정이야.
+    손님은 {enterDate}에 공항코드 ({enterAirplane})에 도착할 예정이야.
+    그리고 공항코드 ({removeAirplane})에서 {removeDate}에 출발할 예정이야.
     다음 키워드들을 관련지어서 여행 플랜을 짜줘.
     [{keywords}]
     여행 경로를 30분 간격으로 상세하게 짜주되, 다음 포맷에 맞춰서 짜줘.
