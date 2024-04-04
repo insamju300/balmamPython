@@ -16,6 +16,16 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import List
 from datetime import datetime
 
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from time import sleep
+import json
+
+
 
 
 app = FastAPI()
@@ -124,3 +134,86 @@ async def createPlan(
     resultData['message'] = 'Success'
     
     return resultData
+
+
+@app.get("/travelPlan/crawlingFlightList")
+async def read_root(departureAirportCode, returnAirportCode, departureDay, returnDay):
+    driver = webdriver.Chrome()
+    url_template = "https://flight.naver.com/flights/international/{departureAirportCode}-{returnAirportCode}-{departureDay}/{returnAirportCode}-{departureAirportCode}-{returnDay}"
+    final_url = url_template.format(departureAirportCode=departureAirportCode, returnAirportCode=returnAirportCode, departureDay=departureDay, returnDay=returnDay)
+    driver.get(final_url)
+    driver.maximize_window()
+    ##로딩 프로그레스바가 나타날때까지 기다리고, 다시 로딩 프로그레스바가 사라질때까지 기다린다.
+    WebDriverWait(driver, 30).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
+    )
+    WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
+    # driver.implicitly_wait(50)
+    flightConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_ConcurrentItemContainer__2lQVG')
+    flightInfoList = []
+
+    for index, flightConatiner in enumerate(flightConatiners):
+        
+        routes = flightConatiner.find_elements(By.CSS_SELECTOR, ".route_Route__2UInh")
+        departureRouteAirforts = routes[0].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
+        departureFromTime=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+        departureFromAirport=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+        departureToTime=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+        departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+        departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+        departureRouteInfo = routes[0].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
+        
+        returnRouteAirforts = routes[1].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
+        returnFromTime=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+        returnFromAirport=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+        returnToTime=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+        returnToAirport=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text 
+        returnRouteInfo = routes[1].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
+        
+        airlines = flightConatiner.find_elements(By.CSS_SELECTOR, ".item_ItemHeader__3G-Hu")
+        
+        paymentMethod = flightConatiner.find_element(By.CSS_SELECTOR,".item_type__2KJOZ").text
+        
+        payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_promoted__2eSDk")
+        if(len(payCheck)==0):
+            payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_usual__dZqAN")
+        pay=payCheck[0].text
+        
+    #    item_usual__dZqAN
+        
+        departureAirline=""
+        returnAirLine=""
+        
+        if(len(airlines)==1):
+            departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+            returnAirLine = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+        else:
+            departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+            returnAirLine = airlines[1].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+        
+        flightInfo = {}
+        flightInfo['index'] = index
+        flightInfo['departureAirline'] = departureAirline
+        flightInfo['departureFromTime'] = departureFromTime
+        flightInfo['departureFromAirport'] = departureFromAirport
+        flightInfo['departureToTime'] = departureToTime
+        flightInfo['departureToAirport'] = departureToAirport
+        flightInfo['departureRouteInfo'] = departureRouteInfo
+        flightInfo['returnAirLine'] = returnAirLine
+        flightInfo['returnFromTime'] = returnFromTime
+        flightInfo['returnFromAirport'] = returnFromAirport
+        flightInfo['returnToTime'] = returnFromAirport
+        flightInfo['returnToAirport'] = returnFromAirport
+        flightInfo['returnRouteInfo'] = returnFromAirport
+        flightInfo['paymentMethod'] = paymentMethod
+        flightInfo['returnFromAirport'] = returnFromAirport
+        print(flightInfo)
+        flightInfoList.append(flightInfo)
+        
+    resultData={}
+    resultData["flightInfoList"] = flightInfoList
+    resultData['resultCode'] = 'S-1'
+    resultData['message'] = 'Success'
+    jsonString = json.dumps(resultData, ensure_ascii=False, indent=4)   
+    driver.close()
+    return jsonString
