@@ -1,6 +1,7 @@
 from typing import Union
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 import sys
 import io
@@ -202,18 +203,17 @@ async def read_root(departureAirportCode, returnAirportCode, departureDay, retur
         flightInfo['returnAirLine'] = returnAirLine
         flightInfo['returnFromTime'] = returnFromTime
         flightInfo['returnFromAirport'] = returnFromAirport
-        flightInfo['returnToTime'] = returnFromAirport
-        flightInfo['returnToAirport'] = returnFromAirport
-        flightInfo['returnRouteInfo'] = returnFromAirport
+        flightInfo['returnToTime'] = returnToTime
+        flightInfo['returnToAirport'] = returnToAirport
+        flightInfo['returnRouteInfo'] = returnRouteInfo
         flightInfo['paymentMethod'] = paymentMethod
-        flightInfo['returnFromAirport'] = returnFromAirport
-        print(flightInfo)
+        flightInfo['pay'] = pay;
         flightInfoList.append(flightInfo)
         
     resultData={}
     resultData["flightInfoList"] = flightInfoList
     resultData['resultCode'] = 'S-1'
     resultData['message'] = 'Success'
-    jsonString = json.dumps(resultData, ensure_ascii=False, indent=4)   
+    
     driver.close()
-    return jsonString
+    return JSONResponse(content=resultData)
