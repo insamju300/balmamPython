@@ -31,19 +31,13 @@ import json
 
 app = FastAPI()
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
-
+# CORS middleware settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost", "http://localhost:8080"],  # Allow access from all domains
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 
@@ -207,7 +201,7 @@ async def read_root(departureAirportCode, returnAirportCode, departureDay, retur
         flightInfo['returnToAirport'] = returnToAirport
         flightInfo['returnRouteInfo'] = returnRouteInfo
         flightInfo['paymentMethod'] = paymentMethod
-        flightInfo['pay'] = pay;
+        flightInfo['pay'] = pay
         flightInfoList.append(flightInfo)
         
     resultData={}
@@ -220,35 +214,8 @@ async def read_root(departureAirportCode, returnAirportCode, departureDay, retur
 
 
 
-@app.get("/travelPlan/crawlingFlightList")
+@app.get("/travelPlan/getTicketingUrl")
 async def read_root(departureAirportCode, returnAirportCode, departureDay, returnDay, index):
-    driver = webdriver.Chrome()
-
-            driver.get("https://flight.naver.com/flights/international/SEL-KIX-20240426/KIX-SEL-20240428")
-            driver.maximize_window()
-            WebDriverWait(driver, 30).until(
-                EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
-            )
-            WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
-
-
-            flatConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_select_schedule__3O1pT')
-            index = 105
-
-            flatConatiners[index].click()
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '.item_detail__2jkvn .item_anchor__2CGzx'))
-            )
-            driver.find_element(By.CSS_SELECTOR, ".item_detail__2jkvn .item_anchor__2CGzx").click()
-            print(driver.current_url)
-                
-    
-    
-    
-    
-    
-    
-    
     driver = webdriver.Chrome()
     url_template = "https://flight.naver.com/flights/international/{departureAirportCode}-{returnAirportCode}-{departureDay}/{returnAirportCode}-{departureAirportCode}-{returnDay}"
     final_url = url_template.format(departureAirportCode=departureAirportCode, returnAirportCode=returnAirportCode, departureDay=departureDay, returnDay=returnDay)
@@ -259,69 +226,20 @@ async def read_root(departureAirportCode, returnAirportCode, departureDay, retur
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
     )
     WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
-    # driver.implicitly_wait(50)
-    flightConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_ConcurrentItemContainer__2lQVG')
-    flightInfoList = []
 
-    for index, flightConatiner in enumerate(flightConatiners):
-        
-        routes = flightConatiner.find_elements(By.CSS_SELECTOR, ".route_Route__2UInh")
-        departureRouteAirforts = routes[0].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
-        departureFromTime=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        departureFromAirport=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        departureToTime=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        departureRouteInfo = routes[0].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
-        
-        returnRouteAirforts = routes[1].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
-        returnFromTime=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        returnFromAirport=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        returnToTime=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        returnToAirport=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text 
-        returnRouteInfo = routes[1].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
-        
-        airlines = flightConatiner.find_elements(By.CSS_SELECTOR, ".item_ItemHeader__3G-Hu")
-        
-        paymentMethod = flightConatiner.find_element(By.CSS_SELECTOR,".item_type__2KJOZ").text
-        
-        payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_promoted__2eSDk")
-        if(len(payCheck)==0):
-            payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_usual__dZqAN")
-        pay=payCheck[0].text
-        
-    #    item_usual__dZqAN
-        
-        departureAirline=""
-        returnAirLine=""
-        
-        if(len(airlines)==1):
-            departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-            returnAirLine = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-        else:
-            departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-            returnAirLine = airlines[1].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-        
-        flightInfo = {}
-        flightInfo['index'] = index
-        flightInfo['departureAirline'] = departureAirline
-        flightInfo['departureFromTime'] = departureFromTime
-        flightInfo['departureFromAirport'] = departureFromAirport
-        flightInfo['departureToTime'] = departureToTime
-        flightInfo['departureToAirport'] = departureToAirport
-        flightInfo['departureRouteInfo'] = departureRouteInfo
-        flightInfo['returnAirLine'] = returnAirLine
-        flightInfo['returnFromTime'] = returnFromTime
-        flightInfo['returnFromAirport'] = returnFromAirport
-        flightInfo['returnToTime'] = returnToTime
-        flightInfo['returnToAirport'] = returnToAirport
-        flightInfo['returnRouteInfo'] = returnRouteInfo
-        flightInfo['paymentMethod'] = paymentMethod
-        flightInfo['pay'] = pay;
-        flightInfoList.append(flightInfo)
+
+    flatConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_select_schedule__3O1pT')
+
+    flatConatiners[index].click()
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, '.item_detail__2jkvn>div:first-child'))
+    )
+    driver.find_element(By.CSS_SELECTOR, ".item_detail__2jkvn>div:first-child").click()
+    print(driver.current_url)         
+    
         
     resultData={}
-    resultData["flightInfoList"] = flightInfoList
+    resultData["url"] = driver.current_url
     resultData['resultCode'] = 'S-1'
     resultData['message'] = 'Success'
     
