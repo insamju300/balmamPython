@@ -132,7 +132,7 @@ async def createPlan(
 
 
 @app.get("/travelPlan/crawlingFlightList")
-async def read_root(departureAirportCode, returnAirportCode, departureDay, returnDay):
+async def crawlingFlightList(departureAirportCode, returnAirportCode, departureDay, returnDay):
     driver = webdriver.Chrome()
     url_template = "https://flight.naver.com/flights/international/{departureAirportCode}-{returnAirportCode}-{departureDay}/{returnAirportCode}-{departureAirportCode}-{returnDay}"
     final_url = url_template.format(departureAirportCode=departureAirportCode, returnAirportCode=returnAirportCode, departureDay=departureDay, returnDay=returnDay)
@@ -215,7 +215,7 @@ async def read_root(departureAirportCode, returnAirportCode, departureDay, retur
 
 
 @app.get("/travelPlan/getTicketingUrl")
-async def read_root(departureAirportCode, returnAirportCode, departureDay, returnDay, index):
+async def getTicketingUrl(departureAirportCode, returnAirportCode, departureDay, returnDay, index):
     driver = webdriver.Chrome()
     url_template = "https://flight.naver.com/flights/international/{departureAirportCode}-{returnAirportCode}-{departureDay}/{returnAirportCode}-{departureAirportCode}-{returnDay}"
     final_url = url_template.format(departureAirportCode=departureAirportCode, returnAirportCode=returnAirportCode, departureDay=departureDay, returnDay=returnDay)
@@ -230,7 +230,7 @@ async def read_root(departureAirportCode, returnAirportCode, departureDay, retur
 
     flatConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_select_schedule__3O1pT')
 
-    flatConatiners[index].click()
+    flatConatiners[int(index)].click()
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CSS_SELECTOR, '.item_detail__2jkvn>div:first-child'))
     )
