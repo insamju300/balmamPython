@@ -53,7 +53,8 @@ async def read_root():
 #     removeDate: str
 #     removeAirplane: str
 #     keywords: List[str] = Query(None) 
-    
+
+##http://127.0.0.1:8000/travelPlan/createPlan?enterDate=2024-04-23&enterAirplane=GMP&removeDate=2024-04-25&removeAirplane=KIX
 @app.get("/travelPlan/createPlan")
 async def createPlan(
     enterDate: str, 
@@ -67,6 +68,8 @@ async def createPlan(
 
 
     load_dotenv()
+
+    print(os.environ.get("OPENAI_API_KEY"))
 
     client = OpenAI(
         # This is the default and can be omitted
