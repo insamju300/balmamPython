@@ -58,9 +58,8 @@ async def read_root():
 @app.get("/travelPlan/createPlan")
 async def createPlan(
     enterDate: str, 
-    enterAirplane: str, 
+    targetAirplane: str, 
     removeDate: str, 
-    removeAirplane: str, 
     keywords: List[str] = Query(None)  # 쿼리 매개변수로 여러 값을 받기 위해 List 사용
 ):
     sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
@@ -79,8 +78,10 @@ async def createPlan(
 
     template = """너는 30년 경력 배태랑의 여행 플래너야.
     넌 지금부터 손님이 패키지를 통하지 않고 직접 여행하기 위한 플랜을 짜줘야해.
-    손님은 {enterDate}에 공항코드 ({enterAirplane})에 도착할 예정이야.
-    그리고 공항코드 ({removeAirplane})에서 {removeDate}에 출발할 예정이야.
+    손님은 {enterDate}에 공항코드 ({targetAirplane})에 도착할 예정이야.
+    그리고 공항코드 ({targetAirplane})에서 {removeDate}에 출발할 예정이야.
+    해당 공항코드에 해당하는 공항 이름을 확인해서, 해당 공항 이름부터 출발해서 해당 공항이름에 도착하는 플랜을 짜줘.
+    공항 명과 공항 도착 날짜, 공항 출발날짜가 가장 우선되야되.
     다음 키워드들을 관련지어서 여행 플랜을 짜줘.
     [{keywords}]
     여행 경로를 30분 간격으로 상세하게 짜주되, 다음 포맷에 맞춰서 짜줘.
@@ -125,8 +126,8 @@ async def createPlan(
 
     # 완성된 Chain 을 이용하여 country 를 '대한민국'으로 설정하여 실행합니다.
     # chain.invoke({"country": "대한민국"})
-    resultData = chain.invoke({"enterDate": enterDate, "enterAirplane": enterAirplane, "removeDate": removeDate, 
-                        "removeAirplane": removeAirplane, "keywords": keywords})
+    resultData = chain.invoke({"enterDate": enterDate, "targetAirplane": targetAirplane, "removeDate": removeDate, 
+                        "keywords": keywords})
 
     resultData['resultCode'] = 'S-1'
     resultData['message'] = 'Success'
