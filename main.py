@@ -151,8 +151,10 @@ async def createPlan(
             plan['imageUrl'] = imageUrl
 
         else:
-            plan['imageUrl'] = ""     
+            plan['imageUrl'] = ""    
 
+
+    resultData['data1'] = resultGpt['plans']
     resultData['resultCode'] = 'S-1'
     resultData['message'] = 'Success'
     
