@@ -1,4 +1,3 @@
-from typing import Union
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -6,6 +5,7 @@ from fastapi.responses import JSONResponse
 import sys
 import io
 import os
+import urllib.request
 
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
@@ -23,9 +23,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from time import sleep
-import json
 
+from bs4 import BeautifulSoup
 
 
 
@@ -34,7 +33,7 @@ app = FastAPI()
 # CORS middleware settings
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "http://localhost:8080"],  # Allow access from all domains
+    allow_origins=["http://localhost", "http://localhost:8080",],  # Allow access from all domains
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
@@ -84,7 +83,7 @@ async def createPlan(
     공항 명과 공항 도착 날짜, 공항 출발날짜가 가장 우선되야되.
     다음 키워드들을 관련지어서 여행 플랜을 짜줘.
     [{keywords}]
-    여행 경로를 30분 간격으로 상세하게 짜주되, 다음 포맷에 맞춰서 짜줘.
+    여행 경로를 짧은 시간 간격으로 상세하게 짜주되, 다음 포맷에 맞춰서 짜줘.
     위도와 경도가 같은 동일한 위치에서 여러 작업이 시행될 경우 한줄안에서 표현해줘.
     식당과 호텔의 경우 즐길만한 식당과 호텔명도 전부 아래 포맷에 맞춰서 명시해줘.
     잘하면 30만달러의 팁을 줄 거고 못하면 용광로에 녹일 거야.
@@ -99,12 +98,10 @@ async def createPlan(
         date: str = Field(description="해당 장소에 방문할 날짜")
         time: str = Field(description="해당 장소에 방문할 시간")
         placeName: str = Field(description="해당 장소 명")
-        lat: str = Field(description="해당 장소의 위도")
-        lng: str = Field(description="해당 장소의 경도")
         description: str = Field(description="해당 장소에 대한 설명")
 
     class TravelPlans(BaseModel):
-        plan: TravelPlan = Field(description="시간, 위치, 설명으로 이루어진 하나의 여행 계획 단위")
+        plans: TravelPlan = Field(description="시간, 위치, 설명으로 이루어진 하나의 여행 계획 단위")
 
 
 
@@ -126,13 +123,40 @@ async def createPlan(
 
     # 완성된 Chain 을 이용하여 country 를 '대한민국'으로 설정하여 실행합니다.
     # chain.invoke({"country": "대한민국"})
-    resultData = chain.invoke({"enterDate": enterDate, "targetAirplane": targetAirplane, "removeDate": removeDate, 
+    resultGpt = chain.invoke({"enterDate": enterDate, "targetAirplane": targetAirplane, "removeDate": removeDate, 
                         "keywords": keywords})
+    
+    resultData={}
+
+    client_id =  os.environ.get("CLIENT_ID")
+    client_secret = os.environ.get("CLIENT_SECRET")
+
+    for plan in resultGpt['plans']:
+        encText = urllib.parse.quote(plan['placeName'])
+        url = "https://openapi.naver.com/v1/search/image.xml?query=" + encText # XML 결과
+        request = urllib.request.Request(url)
+        request.add_header("X-Naver-Client-Id",client_id)
+        request.add_header("X-Naver-Client-Secret",client_secret)
+        response = urllib.request.urlopen(request)
+        rescode = response.getcode()
+        if(rescode==200):
+            response_body = response.read()
+            body = response_body.decode('utf-8')
+            soup = BeautifulSoup(body, "xml")
+            item=soup.find("item")
+            imageUrl = ""
+            if item:
+                foundLink = item.find("link")
+                imageUrl=foundLink.text
+            plan['imageUrl'] = imageUrl
+
+        else:
+            plan['imageUrl'] = ""     
 
     resultData['resultCode'] = 'S-1'
     resultData['message'] = 'Success'
     
-    return resultData
+    return JSONResponse(content=resultData)
 
 
 @app.get("/travelPlan/crawlingFlightList")
