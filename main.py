@@ -169,79 +169,104 @@ async def crawlingFlightList(departureAirportCode, returnAirportCode, departureD
     driver.get(final_url)
     driver.maximize_window()
     ##로딩 프로그레스바가 나타날때까지 기다리고, 다시 로딩 프로그레스바가 사라질때까지 기다린다.
-    WebDriverWait(driver, 30).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
-    )
-    WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
-    # driver.implicitly_wait(50)
-    flightConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_ConcurrentItemContainer__2lQVG')
-    flightInfoList = []
-
-    for index, flightConatiner in enumerate(flightConatiners):
-        
-        routes = flightConatiner.find_elements(By.CSS_SELECTOR, ".route_Route__2UInh")
-        departureRouteAirforts = routes[0].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
-        departureFromTime=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        departureFromAirport=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        departureToTime=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        departureRouteInfo = routes[0].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
-        
-        returnRouteAirforts = routes[1].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
-        returnFromTime=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        returnFromAirport=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-        returnToTime=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-        returnToAirport=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text 
-        returnRouteInfo = routes[1].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
-        
-        airlines = flightConatiner.find_elements(By.CSS_SELECTOR, ".item_ItemHeader__3G-Hu")
-        
-        paymentMethod = flightConatiner.find_element(By.CSS_SELECTOR,".item_type__2KJOZ").text
-        
-        payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_promoted__2eSDk")
-        if(len(payCheck)==0):
-            payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_usual__dZqAN")
-        pay=payCheck[0].text
-        
-    #    item_usual__dZqAN
-        
-        departureAirline=""
-        returnAirLine=""
-        
-        if(len(airlines)==1):
-            departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-            returnAirLine = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-        else:
-            departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-            returnAirLine = airlines[1].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-        
-        flightInfo = {}
-        flightInfo['index'] = index
-        flightInfo['departureAirline'] = departureAirline
-        flightInfo['departureFromTime'] = departureFromTime
-        flightInfo['departureFromAirport'] = departureFromAirport
-        flightInfo['departureToTime'] = departureToTime
-        flightInfo['departureToAirport'] = departureToAirport
-        flightInfo['departureRouteInfo'] = departureRouteInfo
-        flightInfo['returnAirLine'] = returnAirLine
-        flightInfo['returnFromTime'] = returnFromTime
-        flightInfo['returnFromAirport'] = returnFromAirport
-        flightInfo['returnToTime'] = returnToTime
-        flightInfo['returnToAirport'] = returnToAirport
-        flightInfo['returnRouteInfo'] = returnRouteInfo
-        flightInfo['paymentMethod'] = paymentMethod
-        flightInfo['pay'] = pay
-        flightInfoList.append(flightInfo)
-        
-    resultData={}
-    resultData["flightInfoList"] = flightInfoList
-    resultData['resultCode'] = 'S-1'
-    resultData['message'] = 'Success'
+    try:
     
-    driver.close()
-    return JSONResponse(content=resultData)
+        WebDriverWait(driver, 30).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
+        )
+        WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
+    except Exception:
+        pass
 
+    try:
+
+        # driver.implicitly_wait(50)
+        flightConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_ConcurrentItemContainer__2lQVG')
+        flightInfoList = []
+
+          
+
+
+        for index, flightConatiner in enumerate(flightConatiners):
+            
+            routes = flightConatiner.find_elements(By.CSS_SELECTOR, ".route_Route__2UInh")
+            departureRouteAirforts = routes[0].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
+            departureFromTime=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+            departureFromAirport=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+            departureToTime=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+            departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+            departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+            departureRouteInfo = routes[0].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
+            
+            returnRouteAirforts = routes[1].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
+            returnFromTime=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+            returnFromAirport=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
+            returnToTime=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
+            returnToAirport=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text 
+            returnRouteInfo = routes[1].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
+            
+            airlines = flightConatiner.find_elements(By.CSS_SELECTOR, ".item_ItemHeader__3G-Hu")
+            
+            paymentMethod = flightConatiner.find_element(By.CSS_SELECTOR,".item_type__2KJOZ").text
+            
+            payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_promoted__2eSDk")
+            if(len(payCheck)==0):
+                payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_usual__dZqAN")
+            pay=payCheck[0].text
+            
+        #    item_usual__dZqAN
+            
+            departureAirline=""
+            returnAirLine=""
+            
+            if(len(airlines)==1):
+                departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+                returnAirLine = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+            else:
+                departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+                returnAirLine = airlines[1].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+            
+            flightInfo = {}
+            flightInfo['index'] = index
+            flightInfo['departureAirline'] = departureAirline
+            flightInfo['departureFromTime'] = departureFromTime
+            flightInfo['departureFromAirport'] = departureFromAirport
+            flightInfo['departureToTime'] = departureToTime
+            flightInfo['departureToAirport'] = departureToAirport
+            flightInfo['departureRouteInfo'] = departureRouteInfo
+            flightInfo['returnAirLine'] = returnAirLine
+            flightInfo['returnFromTime'] = returnFromTime
+            flightInfo['returnFromAirport'] = returnFromAirport
+            flightInfo['returnToTime'] = returnToTime
+            flightInfo['returnToAirport'] = returnToAirport
+            flightInfo['returnRouteInfo'] = returnRouteInfo
+            flightInfo['paymentMethod'] = paymentMethod
+            flightInfo['pay'] = pay
+            flightInfoList.append(flightInfo)
+
+        driver.close()
+      
+        if flightInfoList is None or len(flightInfoList) == 0:
+            resultData = {
+                'resultCode': 'F-1',
+                'message': '해당 날짜의 항공편이 존재하지 않습니다'
+            }
+            return JSONResponse(content=resultData)
+        
+            
+        resultData={}
+        resultData["flightInfoList"] = flightInfoList
+        resultData['resultCode'] = 'S-1'
+        resultData['message'] = 'Success'
+        
+
+        return JSONResponse(content=resultData)
+    except Exception:
+        resultData={}
+        resultData['resultCode'] = 'F-1'
+        resultData['message'] = '해당 날짜의 항공편이 존재하지 않습니다'
+        driver.close()
+        return JSONResponse(content=resultData)
 
 
 @app.get("/travelPlan/getTicketingUrl")
