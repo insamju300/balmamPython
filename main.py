@@ -126,32 +126,7 @@ async def createPlan(
     resultGpt = chain.invoke({"enterDate": enterDate, "targetAirplane": targetAirplane, "removeDate": removeDate, 
                         "keywords": keywords})
     
-    resultData={}
-
-    client_id =  os.environ.get("CLIENT_ID")
-    client_secret = os.environ.get("CLIENT_SECRET")
-
-    for plan in resultGpt['plans']:
-        encText = urllib.parse.quote(plan['placeName'])
-        url = "https://openapi.naver.com/v1/search/image.xml?query=" + encText # XML 결과
-        request = urllib.request.Request(url)
-        request.add_header("X-Naver-Client-Id",client_id)
-        request.add_header("X-Naver-Client-Secret",client_secret)
-        response = urllib.request.urlopen(request)
-        rescode = response.getcode()
-        if(rescode==200):
-            response_body = response.read()
-            body = response_body.decode('utf-8')
-            soup = BeautifulSoup(body, "xml")
-            item=soup.find("item")
-            imageUrl = ""
-            if item:
-                foundLink = item.find("link")
-                imageUrl=foundLink.text
-            plan['imageUrl'] = imageUrl
-
-        else:
-            plan['imageUrl'] = ""    
+    resultData={} 
 
 
     resultData['data1'] = resultGpt['plans']
