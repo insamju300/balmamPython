@@ -147,46 +147,45 @@ async def crawlingFlightList(departureAirportCode, returnAirportCode, departureD
     try:
     
         WebDriverWait(driver, 30).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, '[class^="loadingProgress_loadingProgress__"]'))
         )
-        WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
+        WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '[class^="loadingProgress_loadingProgress__"]')))
     except Exception:
         pass
 
     try:
 
         # driver.implicitly_wait(50)
-        flightConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_ConcurrentItemContainer__2lQVG')
+        flightConatiners = driver.find_elements(By.CSS_SELECTOR, '[class^="concurrent_ConcurrentItemContainer__"]')
         flightInfoList = []
 
-          
+            
 
 
         for index, flightConatiner in enumerate(flightConatiners):
             
-            routes = flightConatiner.find_elements(By.CSS_SELECTOR, ".route_Route__2UInh")
-            departureRouteAirforts = routes[0].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
-            departureFromTime=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-            departureFromAirport=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-            departureToTime=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-            departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-            departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-            departureRouteInfo = routes[0].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
+            routes = flightConatiner.find_elements(By.CSS_SELECTOR, '[class^="route_Route__"]')
+            departureRouteAirforts = routes[0].find_elements(By.CSS_SELECTOR, '[class^="route_airport__"]')
+            departureFromTime=departureRouteAirforts[0].find_element(By.CSS_SELECTOR, '[class^="route_time__"]').text
+            departureFromAirport=departureRouteAirforts[0].find_element(By.CSS_SELECTOR,'[class^="route_code__"]' ).text
+            departureToTime=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, '[class^="route_time__"]').text
+            departureToAirport=departureRouteAirforts[1].find_element(By.CSS_SELECTOR, '[class^="route_code__"]').text
+            departureRouteInfo = routes[0].find_element(By.CSS_SELECTOR,  '[class^="route_info__"]' ).text
             
-            returnRouteAirforts = routes[1].find_elements(By.CSS_SELECTOR, ".route_airport__3VT7M")
-            returnFromTime=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-            returnFromAirport=returnRouteAirforts[0].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text
-            returnToTime=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_time__-2Z1T").text
-            returnToAirport=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, ".route_code__3WUFO").text 
-            returnRouteInfo = routes[1].find_element(By.CSS_SELECTOR, ".route_info__1RhUH").text
+            returnRouteAirforts = routes[1].find_elements(By.CSS_SELECTOR,  '[class^="route_airport__"]')
+            returnFromTime=returnRouteAirforts[0].find_element(By.CSS_SELECTOR,  '[class^="route_time__"]').text
+            returnFromAirport=returnRouteAirforts[0].find_element(By.CSS_SELECTOR,  '[class^="route_code__"]').text
+            returnToTime=returnRouteAirforts[1].find_element(By.CSS_SELECTOR, '[class^="route_time__"]').text
+            returnToAirport=returnRouteAirforts[1].find_element(By.CSS_SELECTOR,  '[class^="route_code__"]').text 
+            returnRouteInfo = routes[1].find_element(By.CSS_SELECTOR,  '[class^="route_info__"]').text
             
-            airlines = flightConatiner.find_elements(By.CSS_SELECTOR, ".item_ItemHeader__3G-Hu")
+            airlines = flightConatiner.find_elements(By.CSS_SELECTOR, '[class^="item_ItemHeader__"]')
             
-            paymentMethod = flightConatiner.find_element(By.CSS_SELECTOR,".item_type__2KJOZ").text
+            paymentMethod = flightConatiner.find_element(By.CSS_SELECTOR,'[class^="item_type__"]').text
             
-            payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_promoted__2eSDk")
+            payCheck = flightConatiner.find_elements(By.CSS_SELECTOR, '[class^="item_promoted__"]')
             if(len(payCheck)==0):
-                payCheck = flightConatiner.find_elements(By.CSS_SELECTOR,".item_usual__dZqAN")
+                payCheck = flightConatiner.find_elements(By.CSS_SELECTOR, '[class^="item_usual__"]')
             pay=payCheck[0].text
             
         #    item_usual__dZqAN
@@ -195,11 +194,11 @@ async def crawlingFlightList(departureAirportCode, returnAirportCode, departureD
             returnAirLine=""
             
             if(len(airlines)==1):
-                departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-                returnAirLine = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+                departureAirline = airlines[0].find_element(By.CSS_SELECTOR, '[class^="airline_name__"]').text
+                returnAirLine = airlines[0].find_element(By.CSS_SELECTOR, '[class^="airline_name__"]').text
             else:
-                departureAirline = airlines[0].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
-                returnAirLine = airlines[1].find_element(By.CSS_SELECTOR, ".airline_name__Tm2wJ").text
+                departureAirline = airlines[0].find_element(By.CSS_SELECTOR, '[class^="airline_name__"]').text
+                returnAirLine = airlines[1].find_element(By.CSS_SELECTOR,'[class^="airline_name__"]').text
             
             flightInfo = {}
             flightInfo['index'] = index
@@ -220,7 +219,7 @@ async def crawlingFlightList(departureAirportCode, returnAirportCode, departureD
             flightInfoList.append(flightInfo)
 
         driver.close()
-      
+        
         if flightInfoList is None or len(flightInfoList) == 0:
             resultData = {
                 'resultCode': 'F-1',
@@ -238,7 +237,7 @@ async def crawlingFlightList(departureAirportCode, returnAirportCode, departureD
         return JSONResponse(content=resultData)
     except Exception:
         resultData={}
-        resultData['resultCode'] = 'F-1'
+        resultData['resultCode'] = 'F-2'
         resultData['message'] = '해당 날짜의 항공편이 존재하지 않습니다'
         driver.close()
         return JSONResponse(content=resultData)
@@ -253,18 +252,19 @@ async def getTicketingUrl(departureAirportCode, returnAirportCode, departureDay,
     driver.maximize_window()
     ##로딩 프로그레스바가 나타날때까지 기다리고, 다시 로딩 프로그레스바가 사라질때까지 기다린다.
     WebDriverWait(driver, 30).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, '.loadingProgress_loadingProgress__1LRJo'))
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, '[class^="loadingProgress_loadingProgress__"]'))
     )
-    WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, ".loadingProgress_loadingProgress__1LRJo")))
+    
+    WebDriverWait(driver, 50).until(EC.invisibility_of_element_located((By.CSS_SELECTOR, '[class^="loadingProgress_loadingProgress__"]')))
 
 
-    flatConatiners = driver.find_elements(By.CSS_SELECTOR, '.concurrent_select_schedule__3O1pT')
+    flatConatiners = driver.find_elements(By.CSS_SELECTOR, '[class^="concurrent_select_schedule__"]')
 
     flatConatiners[int(index)].click()
     WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, '.item_detail__2jkvn>div:first-child'))
+        EC.presence_of_element_located((By.CSS_SELECTOR, '[class^="item_detail__"]>div:first-child'))
     )
-    driver.find_element(By.CSS_SELECTOR, ".item_detail__2jkvn>div:first-child").click()
+    driver.find_element(By.CSS_SELECTOR, '[class^="item_detail__"]>div:first-child').click()
     print(driver.current_url)         
     
         
